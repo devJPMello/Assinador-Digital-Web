@@ -5,7 +5,6 @@ import { verifyTextWithRsaPss, sha256Hex } from '../crypto.js'
 
 const router = Router()
 
-// GET /verify/:id
 router.get('/verify/:id', async (req, res) => {
   const { id } = req.params
 
@@ -14,14 +13,13 @@ router.get('/verify/:id', async (req, res) => {
     include: { user: { include: { keyPair: true } } }
   })
 
-  // NÃO achou assinatura/chave -> loga valid=false
   if (!sig || !sig.user?.keyPair) {
     await prisma.verifyLog.create({
       data: {
         method: 'byId',
         signatureId: null,
-        valid: false,               // booleano (não use Boolean)
-        requesterIp: req.ip         // nome de coluna correto (não use ip)
+        valid: false,               
+        requesterIp: req.ip         
       }
     })
     return res.json({ valid: false })
@@ -36,7 +34,6 @@ router.get('/verify/:id', async (req, res) => {
     const hashOk = sha256Hex(text) === sig.textHashHex
     valid = ok && hashOk
   } else {
-    // se você não armazena o texto, a validação por ID vira "existente" (ajuste conforme regra do seu projeto)
     valid = true
   }
 
@@ -44,7 +41,7 @@ router.get('/verify/:id', async (req, res) => {
     data: {
       method: 'byId',
       signatureId: sig.id,
-      valid,                        // variável booleana
+      valid,                        
       requesterIp: req.ip,
       algorithm: sig.algorithm ?? null
     }
@@ -60,7 +57,6 @@ router.get('/verify/:id', async (req, res) => {
   })
 })
 
-// POST /verify { text, signatureB64 }
 router.post('/verify', async (req, res) => {
   const schema = z.object({
     text: z.string().min(1),
