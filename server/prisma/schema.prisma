@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  password   String
+  createdAt  DateTime    @default(now())
+  keyPair    KeyPair?
+  signatures Signature[]
+}
+
+
+model KeyPair {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  publicKeyPem     String
+  privateKeyEnc    String
+  algorithm        String
+  createdAt        DateTime @default(now())
+  privateOnceToken String?  @unique
+  user             User     @relation(fields: [userId], references: [id])
+}
+
+model Signature {
+  id           String      @id @default(cuid())
+  userId       String
+  textHashHex  String
+  textStored   String? // opcional
+  signatureB64 String
+  algorithm    String
+  createdAt    DateTime    @default(now())
+  user         User        @relation(fields: [userId], references: [id])
+  logs         VerifyLog[]
+}
+
+model VerifyLog {
+  id              String     @id @default(cuid())
+  method          String // "byId" | "byPayload"
+  signatureId     String? // pode ser nulo em falha
+  providedHashHex String?
+  providedSigB64  String?
+  isValid         Boolean
+  ip              String?
+  createdAt       DateTime   @default(now())
+  signature       Signature? @relation(fields: [signatureId], references: [id])
+}
