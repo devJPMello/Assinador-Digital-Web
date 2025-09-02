@@ -42,12 +42,18 @@ model Signature {
 
 model VerifyLog {
   id              String     @id @default(cuid())
-  method          String 
-  signatureId     String? 
+  createdAt       DateTime   @default(now())
+  method          String     // "byId" | "byPayload"
+  valid           Boolean
+  algorithm       String?
+  signatureId     String?
+  signature       Signature? @relation(fields: [signatureId], references: [id], onDelete: SetNull)
   providedHashHex String?
   providedSigB64  String?
-  isValid         Boolean
-  ip              String?
-  createdAt       DateTime   @default(now())
-  signature       Signature? @relation(fields: [signatureId], references: [id])
+  requesterIp     String?
+  userId          String?
+
+  @@index([createdAt])
+  @@index([signatureId])
+  @@index([method, valid])
 }
