@@ -1,4 +1,3 @@
-// server/src/routes/auth.ts
 import { Router } from 'express'
 import { prisma } from '../prisma.js'
 import { z } from 'zod'
@@ -8,7 +7,6 @@ import { encryptPrivateKey, generateRsaKeyPair } from '../crypto.js'
 
 const router = Router()
 
-// POST /auth/register
 router.post('/register', async (req, res) => {
   const schema = z.object({ email: z.string().email(), password: z.string().min(6) })
   const parse = schema.safeParse(req.body)
@@ -33,7 +31,6 @@ router.post('/register', async (req, res) => {
     .json({ ok: true, userId: user.id })
 })
 
-// POST /auth/login
 router.post('/login', async (req, res) => {
   const schema = z.object({ email: z.string().email(), password: z.string().min(6) })
   const parse = schema.safeParse(req.body)
@@ -50,12 +47,10 @@ router.post('/login', async (req, res) => {
   res.cookie('token', token, { httpOnly: true, sameSite: 'lax' }).json({ ok: true })
 })
 
-// POST /auth/logout
 router.post('/logout', async (_req, res) => {
   res.clearCookie('token').json({ ok: true })
 })
 
-// GET /auth/me (confere sessão real)
 router.get('/me', authRequired, async (req: AuthedRequest, res) => {
   const userId = req.userId!
   const user = await prisma.user.findUnique({

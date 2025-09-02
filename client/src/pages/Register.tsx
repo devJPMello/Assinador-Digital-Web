@@ -21,7 +21,6 @@ export default function Register() {
       if (res.privateExportToken) {
         setPrivateToken(res.privateExportToken)
       }
-      // redireciono depois para você não perder o token de vista:
       navigate('/sign', { replace: true })
     } catch (e: any) {
       setMsg(e.message)

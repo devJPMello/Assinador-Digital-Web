@@ -10,7 +10,6 @@ function sha256Base64(buf: Buffer) {
   return crypto.createHash('sha256').update(buf).digest('base64')
 }
 
-// Fingerprint SHA-256 da chave pública (base64) a partir do SPKI DER
 function publicKeyFingerprint(publicKeyPem: string) {
   const b64 = publicKeyPem
     .replace(/-----BEGIN PUBLIC KEY-----/g, '')
@@ -20,7 +19,6 @@ function publicKeyFingerprint(publicKeyPem: string) {
   return sha256Base64(der)
 }
 
-// GET /keys  → detalhes da chave pública
 router.get('/keys', authRequired, async (req, res) => {
   const userId = (req as any).userId as string
   const kp = await prisma.keyPair.findUnique({ where: { userId } })
@@ -35,7 +33,6 @@ router.get('/keys', authRequired, async (req, res) => {
   })
 })
 
-// GET /keys/public.pem → download da pública
 router.get('/keys/public.pem', authRequired, async (req, res) => {
   const userId = (req as any).userId as string
   const kp = await prisma.keyPair.findUnique({ where: { userId } })
@@ -46,14 +43,6 @@ router.get('/keys/public.pem', authRequired, async (req, res) => {
   res.send(kp.publicKeyPem)
 })
 
-/**
- * VISUALIZAR A PRIVADA EM JSON (DEV)
- * GET /keys/private.view[?token=XYZ]
- * Regras:
- *  - Se EXPOSE_PRIVATE_ALWAYS="true"  => NÃO precisa token.
- *  - Caso contrário, exige token igual ao campo `privateOnceToken` (one-time).
- *  - Ao usar com token, invalida (seta null).
- */
 router.get('/keys/private.view', authRequired, async (req, res) => {
   const userId = (req as any).userId as string
   const kp = await prisma.keyPair.findUnique({ where: { userId } })
@@ -76,18 +65,9 @@ router.get('/keys/private.view', authRequired, async (req, res) => {
       data: { privateOnceToken: null }
     })
   }
-
-  // Retorna para exibição em tela (JSON)
   res.json({ privateKeyPem: privatePem })
 })
 
-/**
- * DOWNLOAD DA PRIVADA (DEV)
- * GET /keys/private.pem[?token=XYZ]
- * Regras iguais ao endpoint de visualização:
- *  - EXPOSE_PRIVATE_ALWAYS="true" => sem token
- *  - Caso contrário, exige token one-time e invalida
- */
 router.get('/keys/private.pem', authRequired, async (req, res) => {
   const userId = (req as any).userId as string
   const kp = await prisma.keyPair.findUnique({ where: { userId } })

@@ -5,7 +5,6 @@ import { verifyTextWithRsaPss, sha256Hex } from '../crypto.js';
 
 const router = Router();
 
-// Verificação pública por ID
 router.get('/verify/:id', async (req, res) => {
   const { id } = req.params;
   const sig = await prisma.signature.findUnique({
@@ -19,9 +18,8 @@ router.get('/verify/:id', async (req, res) => {
     return res.json({ valid: false });
   }
 
-  // precisamos do texto para revalidar; se não armazenado, validamos a consistência (assinado originalmente)
   const publicKey = sig.user.keyPair.publicKeyPem;
-  const text = sig.textStored ?? ''; // se não armazenado, não dá para re-gerar a verificação de conteúdo
+  const text = sig.textStored ?? ''; 
   let valid = false;
 
   if (sig.textStored) {
@@ -29,8 +27,6 @@ router.get('/verify/:id', async (req, res) => {
     const hashOk = sha256Hex(text) === sig.textHashHex;
     valid = ok && hashOk;
   } else {
-    // Se o texto não foi armazenado, consideramos a assinatura "válida (registro)"
-    // e informamos que o conteúdo original não foi salvo para re-verificação completa.
     valid = true;
   }
 
@@ -47,8 +43,6 @@ router.get('/verify/:id', async (req, res) => {
     textStored: Boolean(sig.textStored)
   });
 });
-
-// Verificação pública por payload (texto + assinatura)
 router.post('/verify', async (req, res) => {
   const schema = z.object({
     text: z.string().min(1),
@@ -60,7 +54,6 @@ router.post('/verify', async (req, res) => {
   const { text, signatureB64 } = parse.data;
   const hash = sha256Hex(text);
 
-  // Tenta localizar assinatura igual no banco (para descobrir signatário e chave pública)
   const sig = await prisma.signature.findFirst({
     where: { signatureB64 },
     include: { user: { include: { keyPair: true } } }
@@ -79,7 +72,6 @@ router.post('/verify', async (req, res) => {
     algorithm = sig.algorithm;
     signatureId = sig.id;
   } else {
-    // Caso não esteja no banco, não conseguimos descobrir o signatário e a pubkey.
     valid = false;
   }
 

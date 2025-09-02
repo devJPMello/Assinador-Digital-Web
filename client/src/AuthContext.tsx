@@ -4,8 +4,8 @@ import { api } from "./api";
 export interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
-  login: () => void;   // marcar logado após /auth/login ou /auth/register bem-sucedidos
-  logout: () => void;  // marcar deslogado (e opcionalmente chamar /auth/logout no backend)
+  login: () => void;   
+  logout: () => void; 
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,7 +20,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verifica sessão real no backend (cookie JWT)
     api('/auth/me')
       .then(() => setAuth(true))
       .catch(() => setAuth(false))

@@ -3,7 +3,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Sign from './pages/Sign'
 import Verify from './pages/Verify'
-import Keys from './pages/Keys'              // 👈 novo
+import Keys from './pages/Keys'           
 import PrivateRoute from './PrivateRoute'
 import { AuthProvider, useAuth } from './AuthContext'
 
@@ -13,8 +13,6 @@ function Header() {
   const navigate = useNavigate()
 
   function onLogout() {
-    // Se tiver endpoint /auth/logout no backend, pode chamar aqui:
-    // api('/auth/logout', { method: 'POST' }).catch(() => {})
     logout()
     navigate('/login', { replace: true })
   }
@@ -41,7 +39,6 @@ function Header() {
   )
 }
 
-/** Decide a “home” com base no estado de autenticação */
 function HomeGate() {
   const { isAuthenticated, loading } = useAuth()
   if (loading) return <div style={{ padding: 24 }}>Carregando…</div>
@@ -54,19 +51,12 @@ export default function App() {
       <div style={{ maxWidth: 760, margin: '24px auto', fontFamily: 'system-ui, sans-serif' }}>
         <Header />
         <Routes>
-          {/* abre na tela adequada conforme auth */}
           <Route path="/" element={<HomeGate />} />
-
-          {/* públicas */}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-
-          {/* privadas */}
           <Route path="/sign" element={<PrivateRoute><Sign /></PrivateRoute>} />
           <Route path="/verify" element={<PrivateRoute><Verify /></PrivateRoute>} />
           <Route path="/keys" element={<PrivateRoute><Keys /></PrivateRoute>} /> {/* 👈 novo */}
-
-          {/* fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

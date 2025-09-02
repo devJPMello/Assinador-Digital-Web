@@ -11,8 +11,8 @@ type KeyInfo = {
 export default function Keys() {
   const [data, setData] = useState<KeyInfo | null>(null)
   const [msg, setMsg] = useState('')
-  const [token, setToken] = useState('')          // token one-time (quando exigido)
-  const [privatePem, setPrivatePem] = useState('') // para exibir a privada
+  const [token, setToken] = useState('')        
+  const [privatePem, setPrivatePem] = useState('') 
 
   useEffect(() => {
     api('/keys')

@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.js'
 import signRoutes from './routes/sign.js'
 import verifyRoutes from './routes/verify.js'
-import keysRoutes from './routes/keys.js' // se você criou a página/rotas de chaves
+import keysRoutes from './routes/keys.js'
 
 const app = express()
 const PORT = Number(process.env.PORT || 4000)
@@ -16,7 +16,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
   origin(origin, cb) {
-    if (!origin) return cb(null, true) // curl / same-origin
+    if (!origin) return cb(null, true)
     if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return cb(null, true)
     cb(new Error('Not allowed by CORS'))
   },

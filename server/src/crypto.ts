@@ -4,7 +4,6 @@ const MASTER_KEY = process.env.MASTER_KEY!;
 if (!MASTER_KEY) throw new Error('MASTER_KEY ausente no .env');
 
 function getMasterKey(): Buffer {
-  // Aceita base64 ou hex, ou texto direto (não recomendado).
   try {
     if (/^[A-Za-z0-9+/=]+$/.test(MASTER_KEY) && MASTER_KEY.length % 4 === 0) {
       return Buffer.from(MASTER_KEY, 'base64');
@@ -57,7 +56,6 @@ export function sha256Hex(text: string) {
 }
 
 export function signTextWithRsaPss(privateKeyPem: string, text: string) {
-  // Assina usando SHA-256 internamente; guardamos o hash para referência/auditoria
   const signer = crypto.createSign('sha256');
   signer.update(text, 'utf8');
   signer.end();

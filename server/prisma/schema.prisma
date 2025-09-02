@@ -32,7 +32,7 @@ model Signature {
   id           String      @id @default(cuid())
   userId       String
   textHashHex  String
-  textStored   String? // opcional
+  textStored   String? 
   signatureB64 String
   algorithm    String
   createdAt    DateTime    @default(now())
@@ -42,8 +42,8 @@ model Signature {
 
 model VerifyLog {
   id              String     @id @default(cuid())
-  method          String // "byId" | "byPayload"
-  signatureId     String? // pode ser nulo em falha
+  method          String 
+  signatureId     String? 
   providedHashHex String?
   providedSigB64  String?
   isValid         Boolean
